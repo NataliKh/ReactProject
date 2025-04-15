@@ -1,72 +1,74 @@
-.container {
-	text-align: center;
-	max-width: 950px;
-	margin: 0 auto;
+/* Основные стили калькулятора */
+.calculator {
+  width: 240px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  font-family: Arial, sans-serif;
 }
 
-.buttons-container {
-	display: flex;
-	justify-content: center;
-	gap: 10px;
+/* Поле ввода (дисплей) */
+.calculator-display {
+  width: 100%;
+  height: 50px;
+  margin-bottom: 15px;
+  padding: 10px;
+  font-size: 24px;
+  text-align: right;
+  border: none;
+  border-radius: 5px;
+  background-color: #fff;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.button {
-	padding: 0.5em 0.75em;
-	background-color: hsl(var(--accent-color-hue), var(--accent-color-saturation), 92%);
-	font-size: 18px;
-	border: none;
-	transition: background-color 0.15s ease;
+.calculator-display.done {
+  color: rgb(104, 173, 104)
 }
 
-.button:hover {
-	background-color: hsl(var(--accent-color-hue), var(--accent-color-saturation), 87%);
+/* Контейнер для кнопок */
+.calculator-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
 }
 
-.button:disabled {
-	background-color: var(--disabled-color);
+/* Общие стили кнопок */
+.calculator-button {
+  width: 100%;
+  height: 50px;
+  font-size: 18px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #e0e0e0;
+  transition: background-color 0.2s;
 }
 
-.steps-content {
-	margin-bottom: 30px;
-	min-height: 100px;
-	border: 2px solid hsl(var(--accent-color-hue), var(--accent-color-saturation), 92%);
-	border-radius: 15px;
-	padding: 15px 20px;
+/* Стили кнопок цифр */
+.calculator-button.number {
+  background-color: #f9f9f9;
 }
 
-.steps-list {
-	list-style: none;
-	margin: 0;
-	margin-bottom: 30px;
-	padding: 0;
-	display: flex;
-	justify-content: space-between;
-	gap: 15px;
+/* Стили кнопок операторов (+, -, =) */
+.calculator-button.operator {
+  background-color: #ff9500;
+  color: white;
 }
 
-.steps-item {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	flex: 1 1 0px;
-	font-size: 0.75rem;
+/* Стиль кнопки очистки (C) */
+.calculator-button.clear {
+  background-color: #ff3b30;
+  color: white;
 }
 
-.steps-item-button {
-	cursor: pointer;
-	border-radius: 50%;
-	padding: 0.75rem 1rem;
-	background: #cccccc;
-	border: none;
-	margin-bottom: 0.25rem;
+/* Эффект при наведении */
+.calculator-button:hover {
+  opacity: 0.9;
 }
 
-.steps-item.active .steps-item-button,
-.steps-item.done .steps-item-button {
-	background: hsl(var(--accent-color-hue), var(--accent-color-saturation), 92%);
-}
-
-.steps-item.active,
-.steps-item.active .steps-item-button {
-	font-weight: bold;
+/* Эффект при нажатии */
+.calculator-button:active {
+  transform: scale(0.95);
 }

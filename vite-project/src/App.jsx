@@ -1,84 +1,112 @@
-import styles from './app.module.css';
-import data from './data.json';
-import { useState } from 'react';
+import styles from "./app.module.css";
+import { useState } from "react";
 
 export default function App() {
-  const [steps, setSteps] = useState(data); // Изначально пустой массив
-  const [activeIndex, setActiveIndex] = useState(0);
+  const NUMS = [7, 8, 9, "+", 4, 5, 6, "-", 1, 2, 3, "=", "C", 0];
+  const [operand1, setOperand1] = useState("");
+  const [operand2, setOperand2] = useState("");
+  const [operator, setOperator] = useState("");
+  const [isResult, setIsResult] = useState(false);
 
-
-
-  const isFirstStep = activeIndex === 0;
-  const isLastStep = activeIndex === steps.length - 1;
-
-  const onClickHandlerPrev = () => {
-    if (!isFirstStep) {
-      setActiveIndex(activeIndex - 1);
-    } else {
-      setSteps([...steps]);
-      setActiveIndex(steps.length - 1);
+  function getResult() {
+    let result;
+    const num1 = Number(operand1);
+    const num2 = Number(operand2);
+    if (operator === "+") {
+      result = num1 + num2;
+    } else if (operator === "-") {
+      result = num1 - num2;
     }
-  };
+    return String(result);
+  }
 
-  const onClickHandlerNext = () => {
-    if (!isLastStep) {
-      setActiveIndex(activeIndex + 1);
-    } else {
-      setSteps([...steps]);
-      setActiveIndex(0);
+  function onClickButton(e) {
+    const value = e.target.textContent;
+
+    if (isResult && !isNaN(value)) {
+      setOperand1(value);
+      setOperator("");
+      setOperand2("");
+      setIsResult(false);
+      return;
     }
-  };
 
-  const onClickHandlerDone = (e) => {
-    const index = e.target.textContent;
-    setSteps([...steps]);
-    setActiveIndex(index - 1);
-  };
+    if (!isNaN(value)) {
+      if (operator === "") {
+        setOperand1((prev) => prev + value);
+      } else {
+        setOperand2((prev) => prev + value);
+      }
+    } else if (value === "+" || value === "-") {
+      if (operand1 && !operand2) {
+        setOperator(value);
+      } else if (operand1 && operand2) {
+        setOperand1(getResult());
+        setOperator(value);
+        setOperand2("");
+      }
+      setIsResult(false);
+    } else if (value === "=" && operand1 && operand2 && operator) {
+      setOperand1(getResult());
+      setOperator("");
+      setOperand2("");
+      setIsResult(true);
+    }
+  }
 
-  if (!steps[activeIndex]) {
-    return <div>Нет данных</div>;
+  function onClickButtonClear() {
+    setOperand1("");
+    setOperand2("");
+    setOperator("");
+    setIsResult(false);
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.card}>
-        <h1>{steps[activeIndex]?.title || "Нет данных"}</h1>
-        <div className={styles.steps}>
-          <div className={styles['steps-content']}>
-            <div className={styles['steps-content-text']}>
-              {steps[activeIndex]?.content || "Контент отсутствует"}
-            </div>
-          </div>
-          <ul className={styles['steps-list']}>
-            {steps.map((step, index) => (
-              <li
-                className={`${styles['steps-item']} ${
-                  activeIndex === index ? styles.active : ''
-                } ${index < activeIndex ? styles.done : ''}`}
-                key={step.id}
+    <div className={styles["calculator"]}>
+      <input
+        type="text"
+        className={`${styles["calculator-display"]} ${
+          isResult ? styles["done"] : ""
+        }`}
+        value={operand1 + operator + operand2}
+        readOnly
+      />
+      <div className={styles["calculator-buttons"]}>
+        {NUMS.map((num) => {
+          if (!isNaN(num))
+            return (
+              <button
+                className={styles["calculator-button"] + " " + styles["number"]}
+                onClick={onClickButton}
+                key={num}
               >
-                  <button className={styles['steps-item-button']} onClick={onClickHandlerDone}>{index + 1}</button>
-                  {step.title}
-              </li>
-            ))}
-          </ul>
-          <div className={styles['buttons-container']}>
-            <button
-              className={styles.button}
-              onClick={onClickHandlerPrev}
-              disabled={isFirstStep && activeIndex === 0}
-            >
-              Назад
-            </button>
-            <button
-              className={styles.button}
-              onClick={onClickHandlerNext}
-            >
-              {isLastStep ? 'Начать сначала' : 'Далее'}
-            </button>
-          </div>
-        </div>
+                {num}
+              </button>
+            );
+          else if (num !== "C")
+            return (
+              <button
+                className={
+                  styles["calculator-button"] + " " + styles["operator"]
+                }
+                onClick={onClickButton}
+                key={num}
+              >
+                {num}
+              </button>
+            );
+          else
+            return (
+              <button
+                className={styles["calculator-button"] + " " + styles["clear"]}
+                onClick={onClickButtonClear}
+                key={num}
+              >
+                {num}
+              </button>
+            );
+        })}
       </div>
     </div>
   );
-};
+}
