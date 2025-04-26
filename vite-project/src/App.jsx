@@ -20,33 +20,42 @@ export default function App() {
     return String(result);
   }
 
-  function onClickButton(e) {
-    const value = e.target.textContent;
+  function handleNumberInput(currentValue, newDigit) {
+    // Если текущее значение "0" и вводится новая цифра, заменяем "0" на новую цифру
+    if (currentValue === "0") {
+      return newDigit;
+    }
+    // В остальных случаях просто добавляем цифру
+    return currentValue + newDigit;
+  }
 
-    if (isResult && !isNaN(value)) {
-      setOperand1(value);
+  function onClickButton(value) {
+    const strValue = String(value);
+
+    if (isResult && !isNaN(strValue)) {
+      setOperand1(strValue);
       setOperator("");
       setOperand2("");
       setIsResult(false);
       return;
     }
 
-    if (!isNaN(value)) {
+    if (!isNaN(strValue) || strValue === "0") {
       if (operator === "") {
-        setOperand1((prev) => prev + value);
+        setOperand1(prev => handleNumberInput(prev, strValue));
       } else {
-        setOperand2((prev) => prev + value);
+        setOperand2(prev => handleNumberInput(prev, strValue));
       }
-    } else if (value === "+" || value === "-") {
+    } else if (strValue === "+" || strValue === "-") {
       if (operand1 && !operand2) {
-        setOperator(value);
+        setOperator(strValue);
       } else if (operand1 && operand2) {
         setOperand1(getResult());
-        setOperator(value);
+        setOperator(strValue);
         setOperand2("");
       }
       setIsResult(false);
-    } else if (value === "=" && operand1 && operand2 && operator) {
+    } else if (strValue === "=" && operand1 && operand2 && operator) {
       setOperand1(getResult());
       setOperator("");
       setOperand2("");
@@ -73,12 +82,13 @@ export default function App() {
       />
       <div className={styles["calculator-buttons"]}>
         {NUMS.map((num) => {
-          if (!isNaN(num))
+          const strNum = String(num);
+          if (!isNaN(num) || num === 0)
             return (
               <button
                 className={styles["calculator-button"] + " " + styles["number"]}
-                onClick={onClickButton}
-                key={num}
+                onClick={() => onClickButton(num)}
+                key={strNum}
               >
                 {num}
               </button>
@@ -89,8 +99,8 @@ export default function App() {
                 className={
                   styles["calculator-button"] + " " + styles["operator"]
                 }
-                onClick={onClickButton}
-                key={num}
+                onClick={() => onClickButton(num)}
+                key={strNum}
               >
                 {num}
               </button>
@@ -100,7 +110,7 @@ export default function App() {
               <button
                 className={styles["calculator-button"] + " " + styles["clear"]}
                 onClick={onClickButtonClear}
-                key={num}
+                key={strNum}
               >
                 {num}
               </button>
