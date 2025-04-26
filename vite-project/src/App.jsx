@@ -3,7 +3,7 @@ import data from './data.json';
 import { useState } from 'react';
 
 export default function App() {
-  const [steps, setSteps] = useState(data); // Изначально пустой массив
+  const [steps] = useState(data); // Изначально пустой массив
   const [activeIndex, setActiveIndex] = useState(0);
 
 
@@ -14,8 +14,7 @@ export default function App() {
   const onClickHandlerPrev = () => {
     if (!isFirstStep) {
       setActiveIndex(activeIndex - 1);
-    } else {
-      setSteps([...steps]);
+    } else {     
       setActiveIndex(steps.length - 1);
     }
   };
@@ -23,15 +22,13 @@ export default function App() {
   const onClickHandlerNext = () => {
     if (!isLastStep) {
       setActiveIndex(activeIndex + 1);
-    } else {
-      setSteps([...steps]);
+    } else {     
       setActiveIndex(0);
     }
   };
 
   const onClickHandlerDone = (e) => {
-    const index = e.target.textContent;
-    setSteps([...steps]);
+    const index = e.target.textContent;    
     setActiveIndex(index - 1);
   };
 
