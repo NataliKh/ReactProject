@@ -1,4 +1,5 @@
 import { FieldLayout } from "./FieldLayout.jsx";
+import PropTypes from "prop-types";
 export const Field = ({
   currentPlayer,
   setCurrentPlayer,
@@ -45,4 +46,19 @@ export const Field = ({
   };
 
   return <FieldLayout field={field} onClick={handleCellClick} />;
+};
+
+Field.propTypes = {
+  currentPlayer: PropTypes.oneOf(['X', 'O']).isRequired,
+  setCurrentPlayer: PropTypes.func.isRequired,
+  field: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.oneOf([''])
+    ])
+  ).isRequired,
+  setField: PropTypes.func.isRequired,
+  isGameEnded: PropTypes.bool.isRequired,
+  setIsGameEnded: PropTypes.func.isRequired,
+  setIsDraw: PropTypes.func.isRequired,
 };

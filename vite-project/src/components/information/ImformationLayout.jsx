@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 export const InformationLayout = ({children}) => {
   return (
     <div>
@@ -5,3 +6,7 @@ export const InformationLayout = ({children}) => {
     </div>
   );
 };
+
+InformationLayout.propTypes = {
+  children: PropTypes.string.isRequired
+}

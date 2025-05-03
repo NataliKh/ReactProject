@@ -1,4 +1,5 @@
 import styles from "./FieldLayout.module.css";
+import PropTypes from "prop-types";
 export const FieldLayout = ({ field, onClick }) => {
   return (
     <div className={styles.gameBoard}>
@@ -14,4 +15,14 @@ export const FieldLayout = ({ field, onClick }) => {
       ))}
     </div>
   );
+};
+
+FieldLayout.propTypes = {
+  field: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.oneOf([''])
+    ])
+  ).isRequired,
+  onClick: PropTypes.func.isRequired,
 };
