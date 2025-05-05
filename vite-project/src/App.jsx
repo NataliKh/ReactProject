@@ -62,8 +62,8 @@ export default function App() {
           <div className={styles['buttons-container']}>
             <button
               className={styles.button}
-              onClick={onClickHandlerPrev}
-              disabled={isFirstStep && activeIndex === 0}
+              onClick={onClickHandlerPrev}             
+              disabled={isFirstStep}
             >
               Назад
             </button>
