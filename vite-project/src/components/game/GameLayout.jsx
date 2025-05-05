@@ -3,14 +3,9 @@ import { Information } from "../information/Information.jsx";
 import PropTypes from "prop-types";
 
 export const GameLayout = ({
-  field,
-  setField,
+  field, 
   textInformation,
-  currentPlayer,
-  setCurrentPlayer,
-  isGameEnded,
-  setIsGameEnded,
-  setIsDraw,
+  handleCellClick,
   onClick
 }) => {
   return (
@@ -18,13 +13,7 @@ export const GameLayout = ({
       <Information textInformation={textInformation} />
       <Field
         field={field}
-        setField={setField}
-        currentPlayer={currentPlayer}
-        setCurrentPlayer={setCurrentPlayer}
-        isGameEnded={isGameEnded}
-        setIsGameEnded={setIsGameEnded}
-        setIsDraw = {setIsDraw}
-        onClick = {onClick}
+        handleCellClick = {handleCellClick}
       />
       <button onClick={onClick}>Начать заново</button>
     </>
@@ -37,14 +26,8 @@ GameLayout.propTypes = {
       PropTypes.string,
       PropTypes.oneOf([''])
     ])
-  ).isRequired,
-  setField: PropTypes.func.isRequired,
-  textInformation: PropTypes.string.isRequired,
-  currentPlayer: PropTypes.oneOf(['X', 'O']).isRequired,
-  setCurrentPlayer: PropTypes.func.isRequired,
-  isGameEnded: PropTypes.bool.isRequired,
-  setIsGameEnded: PropTypes.func.isRequired,
-  isDraw: PropTypes.bool.isRequired,
-  setIsDraw: PropTypes.func.isRequired,
-  onClick: PropTypes.func.isRequired
+  ).isRequired,  
+  textInformation: PropTypes.string.isRequired,  
+  onClick: PropTypes.func.isRequired,
+  handleCellClick: PropTypes.func.isRequired
 };

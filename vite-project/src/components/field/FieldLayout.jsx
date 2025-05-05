@@ -1,6 +1,6 @@
 import styles from "./FieldLayout.module.css";
 import PropTypes from "prop-types";
-export const FieldLayout = ({ field, onClick }) => {
+export const FieldLayout = ({ field, handleCellClick }) => {
   return (
     <div className={styles.gameBoard}>
       {field.map((el, index) => (
@@ -8,7 +8,7 @@ export const FieldLayout = ({ field, onClick }) => {
           key={index}
           className={styles.cell}
           data-index={index}
-          onClick={() => onClick(index)}
+          onClick={() => handleCellClick(index)}
         >
           {el}
         </div>
