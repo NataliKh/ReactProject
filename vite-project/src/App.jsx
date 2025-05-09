@@ -1,70 +1,153 @@
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
 import styles from "./App.module.css";
+import { useState, useRef, useEffect } from "react";
 
-const schema = yup.object({
-  email: yup
-    .string()
-    .email("Некорректный email")
-    .required("Заполните email"),
-  password: yup
-    .string()
-    .min(3, "Пароль должен содержать минимум 3 символа")
-    .max(20, "Пароль должен содержать максимум 20 символов")
-    .required("Введите пароль"),
-  passwordRepeat: yup
-    .string()
-    .oneOf([yup.ref("password")], "Пароли не совпадают")
-    .required("Повторите пароль"),
-});
+// Функция валидации полей
+const validateField = (fieldName, fieldValue, password = "") => {
+  if (!fieldValue) {
+    return "Поле не может быть пустым";
+  }
+
+  if (fieldName === "password" && fieldValue.length < 5) {
+    return "Пароль слишком короткий";
+  }
+
+  if (
+    fieldName === "email" &&
+    !/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+      fieldValue
+    )
+  ) {
+    return "Некорректный email";
+  }
+
+  if (fieldName === "repeatPassword" && fieldValue !== password) {
+    return "Пароли не совпадают";
+  }
+
+  return ""; // Нет ошибок
+};
 
 function App() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid },
-  } = useForm({
-    resolver: yupResolver(schema),
-    mode: "onChange",
+  // Объединяем все поля формы в один объект
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    repeatPassword: "",
   });
 
-  const onSubmit = (data) => {
-    console.log(data);
+  // Храним ошибки для каждого поля отдельно
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+    repeatPassword: "",
+  });
+
+  const refReg = useRef(null);
+
+  // Обработчик изменения полей
+  const onChangeInputForm = (e) => {
+    const { name, value } = e.target;
+
+    // Обновляем данные формы
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // Для поля repeatPassword проверяем совпадение с password
+    const errorMsg =
+      name === "repeatPassword"
+        ? validateField(name, value, formData.password)
+        : validateField(name, value);
+
+    // Обновляем ошибки
+    setErrors((prev) => ({
+      ...prev,
+      [name]: errorMsg,
+    }));
   };
 
+  // Обработчик отправки формы
+  const handleSubmitForm = (e) => {
+    e.preventDefault();
+
+    // Валидируем все поля
+    const newErrors = {
+      email: validateField("email", formData.email),
+      password: validateField("password", formData.password),
+      repeatPassword: validateField(
+        "repeatPassword",
+        formData.repeatPassword,
+        formData.password
+      ),
+    };
+
+    setErrors(newErrors);
+
+    // Проверяем, есть ли ошибки
+    const hasErrors = Object.values(newErrors).some((error) => error !== "");
+
+    // Если ошибок нет - отправляем данные
+    if (!hasErrors) {
+      console.log(formData);
+    }
+  };
+
+  const isFormValid =
+    !Object.values(errors).some((error) => error !== "") &&
+    formData.email &&
+    formData.password &&
+    formData.repeatPassword;
+
+  useEffect(() => {
+    if (isFormValid && refReg.current) {
+      refReg.current.focus();
+    }
+  }, [isFormValid]);
   return (
-    <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-      <input className={styles.formControl}
-        {...register("email")}
+    <form className={styles.form} onSubmit={handleSubmitForm}>
+      <input
+        className={styles.formControl}
         type="email"
+        name="email"
         placeholder="Введите email"
+        value={formData.email}
+        onChange={onChangeInputForm}
       />
       {errors.email && (
-        <div className={styles.validationError}>{errors.email.message}</div>
+        <div className={styles.validationError}>{errors.email}</div>
       )}
 
-      <input className={styles.formControl}
-        {...register("password")}
+      <input
+        className={styles.formControl}
         type="password"
+        name="password"
         placeholder="Введите пароль"
+        value={formData.password}
+        onChange={onChangeInputForm}
       />
       {errors.password && (
-        <div className={styles.validationError}>{errors.password.message}</div>
+        <div className={styles.validationError}>{errors.password}</div>
       )}
 
-      <input className={styles.formControl}
-        {...register("passwordRepeat")}
+      <input
+        className={styles.formControl}
         type="password"
+        name="repeatPassword"
         placeholder="Повторите пароль"
+        value={formData.repeatPassword}
+        onChange={onChangeInputForm}
       />
-      {errors.passwordRepeat && (
-        <div className={styles.validationError}>
-          {errors.passwordRepeat.message}
-        </div>
+      {errors.repeatPassword && (
+        <div className={styles.validationError}>{errors.repeatPassword}</div>
       )}
 
-      <button type="submit" disabled={!isValid}>
+      <button
+        ref={refReg}
+        className={styles.button}
+        type="submit"
+        disabled={!isFormValid}
+      >
         Зарегистрироваться
       </button>
     </form>
