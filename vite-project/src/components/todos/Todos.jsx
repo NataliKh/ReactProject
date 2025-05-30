@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { ref, onValue, push, set, remove } from "firebase/database";
+import { db } from "../../firebase.js";
 import { Todo } from "../todo/Todo.jsx";
 import styles from "./Todos.module.css";
 
 export const Todos = () => {
   const [todos, setTodos] = useState([]);
   const [todoInput, setTodoInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [refreshTodos, setRefreshTodos] = useState(false);
   const [isSorted, setIsSorted] = useState(false);
@@ -14,29 +16,28 @@ export const Todos = () => {
 
   // Получение списка задач
   useEffect(() => {
-    setIsLoading(true);
-    fetch("http://localhost:3003/todos")
-      .then((response) => response.json())
-      .then((loadedTodos) => {
-        setTodos(loadedTodos);
-        setIsDeleting(false);
-      })
-      .finally(() => setIsLoading(false));
-  }, [refreshTodos]);
+    const todosDbRef = ref(db, "todos");
+    return onValue(todosDbRef, (snapshot) => {
+      const loadedTodos = snapshot.val() || {};
+      const todosObject = Object.entries(loadedTodos);
+      const todosArray = todosObject.map(([key, value]) => ({
+        id: key,
+        ...value,
+      }));
+      setTodos(todosArray);
+      setIsLoading(false);
+    });
+  }, []);
 
   // Добавление новой задачи
   const addNewTodo = () => {
     setIsCreating(true);
-    fetch("http://localhost:3003/todos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json;charset=UTF-8" },
-      body: JSON.stringify({
-        title: todoInput,
-        completed: false,
-      }),
+    const todosDbRef = ref(db, "todos");
+    push(todosDbRef, {
+      title: todoInput,
+      completed: false,
     })
-      .then((response) => response.json())
-      .then(() => setRefreshTodos((r) => !r)) // Просто обновить список после добавления
+      .then() // Просто обновить список после добавления
       .finally(() => {
         setTodoInput("");
         setIsCreating(false);
@@ -46,27 +47,28 @@ export const Todos = () => {
   // Удаление задачи
   const handleDeleteTodo = (id) => {
     setIsDeleting(true);
-    fetch(`http://localhost:3003/todos/${id}`, {
-      method: "DELETE",
-    })
-      .then(() => setRefreshTodos((r) => !r))
-      .finally(() => {});
+    const todosDbRef = ref(db, `todos/${id}`);
+    remove(todosDbRef)
+      .then()
+      .finally(() => {
+        setIsLoading(false);
+        setIsDeleting(false);
+      });
   };
 
   // Изменение completed
   const updateComplatedTodo = (id) => {
     setIsCreating(true);
+    const todosDbRef = ref(db, `todos/${id}`);
     const todoToUpdate = todos.find((todo) => todo.id === id);
     if (!todoToUpdate) return;
     const newCompleted = !todoToUpdate.completed;
-    fetch(`http://localhost:3003/todos/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json;charset=UTF-8" },
-      body: JSON.stringify({
-        completed: newCompleted,
-      }),
+
+    set(todosDbRef, {
+      ...todoToUpdate,
+      completed: newCompleted,
     })
-      .then(() => setRefreshTodos((r) => !r))
+      .then()
       .finally(() => {
         setIsCreating(false);
       });
@@ -74,13 +76,11 @@ export const Todos = () => {
 
   // Редактирование задачи
   const editTitleTodo = (id, title) => {
-    fetch(`http://localhost:3003/todos/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json;charset=UTF-8" },
-      body: JSON.stringify({
-        title: title,
-      }),
-    }).then(() => setRefreshTodos((r) => !r));
+    const todosDbRef = ref(db, `todos/${id}`);
+    set(todosDbRef, {
+      title,
+    })
+    .then();
   };
 
   // Поиск и сортировка с debounce
