@@ -43,46 +43,6 @@ export const Todos = () => {
       });
   };
 
-  // Удаление задачи
-  const handleDeleteTodo = (id) => {
-    setIsDeleting(true);
-    fetch(`http://localhost:3003/todos/${id}`, {
-      method: "DELETE",
-    })
-      .then(() => setRefreshTodos((r) => !r))
-      .finally(() => {});
-  };
-
-  // Изменение completed
-  const updateComplatedTodo = (id) => {
-    setIsCreating(true);
-    const todoToUpdate = todos.find((todo) => todo.id === id);
-    if (!todoToUpdate) return;
-    const newCompleted = !todoToUpdate.completed;
-    fetch(`http://localhost:3003/todos/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json;charset=UTF-8" },
-      body: JSON.stringify({
-        completed: newCompleted,
-      }),
-    })
-      .then(() => setRefreshTodos((r) => !r))
-      .finally(() => {
-        setIsCreating(false);
-      });
-  };
-
-  // Редактирование задачи
-  const editTitleTodo = (id, title) => {
-    fetch(`http://localhost:3003/todos/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json;charset=UTF-8" },
-      body: JSON.stringify({
-        title: title,
-      }),
-    }).then(() => setRefreshTodos((r) => !r));
-  };
-
   // Поиск и сортировка с debounce
   const [visibleTodos, setVisibleTodos] = useState([]);
   useEffect(() => {
@@ -162,16 +122,7 @@ export const Todos = () => {
         <div className={styles["todo-list"]}>
           {isLoading && <p>Загрузка...</p>}
           {visibleTodos.map(({ id, title, completed }) => (
-            <Todo
-              key={id}
-              id={id}
-              title={title}
-              done={completed}
-              handleDeleteTodo={handleDeleteTodo}
-              updateComplatedTodo={updateComplatedTodo}
-              editTitleTodo={editTitleTodo}
-              isDeleting={isDeleting}
-            />
+            <Todo key={id} id={id} title={title} done={completed} />
           ))}
         </div>
       )}

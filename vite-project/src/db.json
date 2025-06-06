@@ -1,3 +1,19 @@
 {
-  "todos": []
+  "todos": [
+    {
+      "id": "fee2",
+      "title": "Задача 1",
+      "completed": true
+    },
+    {
+      "id": "ea35",
+      "title": "Задача 2",
+      "completed": false
+    },
+    {
+      "id": "ba36",
+      "title": "12",
+      "completed": false
+    }
+  ]
 }
