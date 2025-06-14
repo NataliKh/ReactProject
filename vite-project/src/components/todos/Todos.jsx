@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Todo } from "../todo/Todo.jsx";
 import styles from "./Todos.module.css";
+import { TodoContext } from "../../context/TodoContext.js";
 
 export const Todos = () => {
   const [todos, setTodos] = useState([]);
@@ -119,12 +120,12 @@ export const Todos = () => {
         </div>
       </div>
       {visibleTodos.length > 0 && (
-        <div className={styles["todo-list"]}>
-          {isLoading && <p>Загрузка...</p>}
-          {visibleTodos.map(({ id, title, completed }) => (
-            <Todo key={id} id={id} title={title} done={completed} />
-          ))}
-        </div>
+        <TodoContext.Provider value={{ visibleTodos }}>
+          <div className={styles["todo-list"]}>
+            {isLoading && <p>Загрузка...</p>}
+            <Todo />
+          </div>
+        </TodoContext.Provider>
       )}
       {visibleTodos.length === 0 && <p>Нет задач</p>}
     </>
