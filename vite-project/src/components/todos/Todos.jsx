@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Todo } from "../todo/Todo.jsx";
 import styles from "./Todos.module.css";
 
@@ -11,6 +11,8 @@ export const Todos = () => {
   const [isSorted, setIsSorted] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [debouncedSearchValue, setDebouncedSearchValue] = useState("");
+  const debounceTimeout = useRef(null);
 
   // Получение списка задач
   useEffect(() => {
@@ -83,28 +85,38 @@ export const Todos = () => {
     }).then(() => setRefreshTodos((r) => !r));
   };
 
-  // Поиск и сортировка с debounce
-  const [visibleTodos, setVisibleTodos] = useState([]);
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      let filtered = todos;
-      if (searchValue.trim() !== "") {
-        filtered = todos.filter((todo) =>
-          todo.title.toLowerCase().includes(searchValue.trim().toLowerCase())
-        );
-      }
-      if (isSorted) {
-        filtered = [...filtered].sort((a, b) => a.title.localeCompare(b.title));
-      }
-      setVisibleTodos(filtered);
-    }, 400);
+  const visibleTodos = useMemo(() => {
+    let filtered = Array.isArray(todos) ? todos : [];
 
-    return () => clearTimeout(handler);
-  }, [searchValue, todos, isSorted]);
+    if (debouncedSearchValue.trim() !== "") {
+      filtered = filtered.filter((todo) =>
+        todo.title
+          .toLowerCase()
+          .includes(debouncedSearchValue.trim().toLowerCase())
+      );
+    }
+
+    if (isSorted) {
+      filtered = [...filtered].sort((a, b) => a.title.localeCompare(b.title));
+    }
+
+    return filtered;
+  }, [todos, debouncedSearchValue, isSorted]);
 
   // Обработчики
   const handleSotred = () => setIsSorted((prev) => !prev);
-  const handleSearchInput = (e) => setSearchValue(e.target.value);
+  const handleSearchInput = (e) => {
+    const value = e.target.value;
+    setSearchValue(value);
+
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+
+    debounceTimeout.current = setTimeout(() => {
+      setDebouncedSearchValue(value);
+    }, 400);
+  };
 
   return (
     <>
