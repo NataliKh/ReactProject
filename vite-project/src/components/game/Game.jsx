@@ -1,18 +1,10 @@
-import { useEffect, useState } from "react";
 import { GameLayout } from "./GameLayout.jsx";
-import { store } from "../../store";
+import { useDispatch, useSelector } from "react-redux";
 
 export const Game = () => {
-  const [, setVersion] = useState(0);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    const unsubscribe = store.subscribe(() => {
-      setVersion((v) => v + 1);
-    });
-    return unsubscribe;
-  }, []);
-
-  const state = store.getState();
+  const state = useSelector((state) => state);
 
   const getTextInformation = () => {
     if (state.isGameEnded) {
@@ -22,11 +14,11 @@ export const Game = () => {
   };
 
   const handleResetClick = () => {
-    store.dispatch({ type: "RESET" });
+    dispatch({ type: "RESET" });
   };
 
   const handleCellClick = (index) => {
-    store.dispatch({ type: "CLICK_CELL", payload: { index } });
+    dispatch({ type: "CLICK_CELL", payload: { index } });
   };
 
   return (
