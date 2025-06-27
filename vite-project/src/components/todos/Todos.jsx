@@ -1,88 +1,52 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Todo } from "../todo/Todo.jsx";
 import styles from "./Todos.module.css";
+import {
+  loadedTodos,
+  addNewTodo,
+  deleteTodo,
+  updateComplatedTodo,
+  editTodo,
+} from "../../action/action.js";
+import { useSelector, useDispatch } from "react-redux";
 
 export const Todos = () => {
-  const [todos, setTodos] = useState([]);
   const [todoInput, setTodoInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
-  const [refreshTodos, setRefreshTodos] = useState(false);
   const [isSorted, setIsSorted] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
   const [debouncedSearchValue, setDebouncedSearchValue] = useState("");
   const debounceTimeout = useRef(null);
-
+  const dispatch = useDispatch();
+  const todos = useSelector((state) => state.todos.todos);
+  const isLoading = useSelector((state) => state.todos.isLoading);
+  const isDeleting = useSelector((state) => state.todos.isDeleting);
   // Получение списка задач
   useEffect(() => {
-    setIsLoading(true);
-    fetch("http://localhost:3003/todos")
-      .then((response) => response.json())
-      .then((loadedTodos) => {
-        setTodos(loadedTodos);
-        setIsDeleting(false);
-      })
-      .finally(() => setIsLoading(false));
-  }, [refreshTodos]);
+    dispatch(loadedTodos());
+  }, [dispatch]);
 
   // Добавление новой задачи
-  const addNewTodo = () => {
-    setIsCreating(true);
-    fetch("http://localhost:3003/todos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json;charset=UTF-8" },
-      body: JSON.stringify({
-        title: todoInput,
-        completed: false,
-      }),
-    })
-      .then((response) => response.json())
-      .then(() => setRefreshTodos((r) => !r)) // Просто обновить список после добавления
-      .finally(() => {
-        setTodoInput("");
-        setIsCreating(false);
-      });
+  const handleAddNewTodo = () => {
+    dispatch(addNewTodo(todoInput));
+    setTodoInput("");
   };
 
-  // Удаление задачи
+  // // Удаление задачи
   const handleDeleteTodo = (id) => {
-    setIsDeleting(true);
-    fetch(`http://localhost:3003/todos/${id}`, {
-      method: "DELETE",
-    })
-      .then(() => setRefreshTodos((r) => !r))
-      .finally(() => {});
+    dispatch(deleteTodo(id));
   };
 
-  // Изменение completed
-  const updateComplatedTodo = (id) => {
-    setIsCreating(true);
+  // // Изменение completed
+  const handleUpdateComplatedTodo = (id) => {
     const todoToUpdate = todos.find((todo) => todo.id === id);
     if (!todoToUpdate) return;
     const newCompleted = !todoToUpdate.completed;
-    fetch(`http://localhost:3003/todos/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json;charset=UTF-8" },
-      body: JSON.stringify({
-        completed: newCompleted,
-      }),
-    })
-      .then(() => setRefreshTodos((r) => !r))
-      .finally(() => {
-        setIsCreating(false);
-      });
+    dispatch(updateComplatedTodo(id, newCompleted));
   };
 
-  // Редактирование задачи
-  const editTitleTodo = (id, title) => {
-    fetch(`http://localhost:3003/todos/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json;charset=UTF-8" },
-      body: JSON.stringify({
-        title: title,
-      }),
-    }).then(() => setRefreshTodos((r) => !r));
+  // // Редактирование задачи
+  const handleEditTitleTodo = (id, title) => {
+    dispatch(editTodo(id, title));
   };
 
   const visibleTodos = useMemo(() => {
@@ -103,7 +67,7 @@ export const Todos = () => {
     return filtered;
   }, [todos, debouncedSearchValue, isSorted]);
 
-  // Обработчики
+  // // Обработчики
   const handleSotred = () => setIsSorted((prev) => !prev);
   const handleSearchInput = (e) => {
     const value = e.target.value;
@@ -130,8 +94,8 @@ export const Todos = () => {
         />
         <button
           className={styles["add-todo-button-inside"]}
-          onClick={addNewTodo}
-          disabled={isCreating}
+          onClick={handleAddNewTodo}
+          disabled={isLoading}
           aria-label="Добавить задачу"
         >
           +
@@ -180,8 +144,8 @@ export const Todos = () => {
               title={title}
               done={completed}
               handleDeleteTodo={handleDeleteTodo}
-              updateComplatedTodo={updateComplatedTodo}
-              editTitleTodo={editTitleTodo}
+              updateComplatedTodo={handleUpdateComplatedTodo}
+              editTitleTodo={handleEditTitleTodo}
               isDeleting={isDeleting}
             />
           ))}
