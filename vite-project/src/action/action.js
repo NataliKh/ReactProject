@@ -1,6 +1,9 @@
 export const FETCH_DATA_REQUEST = "FETCH_DATA_REQUEST";
 export const FETCH_DATA_SUCCESS = "FETCH_DATA_SUCCESS";
 export const FETCH_DATA_FAILURE = "FETCH_DATA_FAILURE";
+export const INITIALIZE_OPERATIONS = "INITIALIZE_OPERATIONS";
+export const UPDATE_TODOS = "UPDATE_TODOS";
+export const UPDATE_SEARCH_SORT_STATE = "UPDATE_SEARCH_SORT_STATE";
 
 // Синхронные действия
 export const fetchDataRequest = () => ({
@@ -10,6 +13,11 @@ export const fetchDataRequest = () => ({
 export const fetchDataSuccess = (data) => ({
   type: FETCH_DATA_SUCCESS,
   payload: data,
+});
+
+export const initializeOperations = (todos) => ({
+  type: INITIALIZE_OPERATIONS,
+  payload: todos,
 });
 
 export const fetchDataFailure = (error) => ({
@@ -25,6 +33,7 @@ export const loadedTodos = () => {
       const response = await fetch("http://localhost:3003/todos");
       const todos = await response.json();
       dispatch(fetchDataSuccess(todos));
+      dispatch(initializeOperations(todos));
     } catch (error) {
       dispatch(fetchDataFailure(error.message));
     }
@@ -46,6 +55,7 @@ export const addNewTodo = (todoInput) => {
       const response = await fetch("http://localhost:3003/todos");
       const refreshTodo = await response.json();
       dispatch(fetchDataSuccess(refreshTodo));
+      dispatch(initializeOperations(refreshTodo));
     } catch (error) {
       dispatch(fetchDataFailure(error.message));
     }
@@ -62,6 +72,7 @@ export const deleteTodo = (todoId) => {
       const response = await fetch("http://localhost:3003/todos");
       const refreshTodo = await response.json();
       dispatch(fetchDataSuccess(refreshTodo));
+      dispatch(initializeOperations(refreshTodo));
     } catch (error) {
       dispatch(fetchDataFailure(error.message));
     }
@@ -82,6 +93,7 @@ export const updateComplatedTodo = (todoId, newCompleted) => {
       const response = await fetch("http://localhost:3003/todos");
       const refreshTodo = await response.json();
       dispatch(fetchDataSuccess(refreshTodo));
+      dispatch(initializeOperations(refreshTodo));
     } catch (error) {
       dispatch(fetchDataFailure(error.message));
     }
@@ -102,8 +114,34 @@ export const editTodo = (todoId, todoInput) => {
       const response = await fetch("http://localhost:3003/todos");
       const refreshTodo = await response.json();
       dispatch(fetchDataSuccess(refreshTodo));
+      dispatch(initializeOperations(refreshTodo));
     } catch (error) {
       dispatch(fetchDataFailure(error.message));
     }
   };
 };
+
+export const searchAndSortTodos =
+  (allTodos, searchInput, isSorted) => (dispatch) => {
+    let filtered = [...allTodos];
+
+    if (searchInput.trim() !== "") {
+      filtered = filtered.filter((todo) =>
+        todo.title.toLowerCase().includes(searchInput.trim().toLowerCase())
+      );
+    }
+
+    if (isSorted) {
+      filtered.sort((a, b) => a.title.localeCompare(b.title));
+    }
+
+    dispatch({
+      type: "UPDATE_TODOS",
+      payload: filtered,
+    });
+
+    dispatch({
+      type: "UPDATE_SEARCH_SORT_STATE",
+      payload: { searchInput, isSorted },
+    });
+  };
