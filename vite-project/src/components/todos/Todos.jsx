@@ -14,14 +14,9 @@ import { useSelector, useDispatch } from "react-redux";
 export const Todos = () => {
   const dispatch = useDispatch();
 
-  const { todos, isProcessing } = useSelector((state) => state.todos);
-
-  const {
-    todos: visibleTodos,
-    allTodos,
-    searchInput,
-    isSorted,
-  } = useSelector((state) => state.operations);
+  const { todos, allTodos, isProcessing, isSorted, searchInput } = useSelector(
+    (state) => state
+  );
 
   const [searchInputValue, setSearchInputValue] = useState(searchInput);
   const [todoInput, setTodoInput] = useState("");
@@ -139,9 +134,9 @@ export const Todos = () => {
 
       {isProcessing && <p>Загрузка...</p>}
 
-      {visibleTodos.length > 0 ? (
+      {todos.length > 0 ? (
         <div className={styles["todo-list"]}>
-          {visibleTodos.map(({ id, title, completed }) => (
+          {todos.map(({ id, title, completed }) => (
             <Todo
               key={id}
               id={id}

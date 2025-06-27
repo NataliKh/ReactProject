@@ -33,7 +33,6 @@ export const loadedTodos = () => {
       const response = await fetch("http://localhost:3003/todos");
       const todos = await response.json();
       dispatch(fetchDataSuccess(todos));
-      dispatch(initializeOperations(todos));
     } catch (error) {
       dispatch(fetchDataFailure(error.message));
     }
@@ -55,7 +54,6 @@ export const addNewTodo = (todoInput) => {
       const response = await fetch("http://localhost:3003/todos");
       const refreshTodo = await response.json();
       dispatch(fetchDataSuccess(refreshTodo));
-      dispatch(initializeOperations(refreshTodo));
     } catch (error) {
       dispatch(fetchDataFailure(error.message));
     }
@@ -72,7 +70,6 @@ export const deleteTodo = (todoId) => {
       const response = await fetch("http://localhost:3003/todos");
       const refreshTodo = await response.json();
       dispatch(fetchDataSuccess(refreshTodo));
-      dispatch(initializeOperations(refreshTodo));
     } catch (error) {
       dispatch(fetchDataFailure(error.message));
     }
@@ -93,7 +90,6 @@ export const updateComplatedTodo = (todoId, newCompleted) => {
       const response = await fetch("http://localhost:3003/todos");
       const refreshTodo = await response.json();
       dispatch(fetchDataSuccess(refreshTodo));
-      dispatch(initializeOperations(refreshTodo));
     } catch (error) {
       dispatch(fetchDataFailure(error.message));
     }
@@ -114,7 +110,6 @@ export const editTodo = (todoId, todoInput) => {
       const response = await fetch("http://localhost:3003/todos");
       const refreshTodo = await response.json();
       dispatch(fetchDataSuccess(refreshTodo));
-      dispatch(initializeOperations(refreshTodo));
     } catch (error) {
       dispatch(fetchDataFailure(error.message));
     }
