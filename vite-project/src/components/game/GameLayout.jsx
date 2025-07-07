@@ -1,33 +1,27 @@
 import { Field } from "../field/Field.jsx";
 import { Information } from "../information/Information.jsx";
-import PropTypes from "prop-types";
+import { store } from "../../store";
+import { useEffect, useState } from "react";
 
-export const GameLayout = ({
-  field, 
-  textInformation,
-  handleCellClick,
-  onClick
-}) => {
+export const GameLayout = () => {
+  const [, setVersion] = useState(0);
+
+  useEffect(() => {
+    const unsubscribe = store.subscribe(() => {
+      setVersion((v) => v + 1);
+    });
+    return unsubscribe;
+  }, []);
+
+  const handleResetClick = () => {
+    store.dispatch({ type: "RESET" });
+  };
+
   return (
     <>
-      <Information textInformation={textInformation} />
-      <Field
-        field={field}
-        handleCellClick = {handleCellClick}
-      />
-      <button onClick={onClick}>Начать заново</button>
+      <Information />
+      <Field />
+      <button onClick={handleResetClick}>Начать заново</button>
     </>
   );
-};
-
-GameLayout.propTypes = {
-  field: PropTypes.arrayOf(
-    PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.oneOf([''])
-    ])
-  ).isRequired,  
-  textInformation: PropTypes.string.isRequired,  
-  onClick: PropTypes.func.isRequired,
-  handleCellClick: PropTypes.func.isRequired
 };

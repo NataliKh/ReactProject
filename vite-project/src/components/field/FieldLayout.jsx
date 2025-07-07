@@ -1,9 +1,26 @@
 import styles from "./FieldLayout.module.css";
-import PropTypes from "prop-types";
-export const FieldLayout = ({ field, handleCellClick }) => {
+import { store } from "../../store";
+import { useEffect, useState } from "react";
+
+export const FieldLayout = () => {
+  const [, setVersion] = useState(0);
+
+  useEffect(() => {
+    const unsubscribe = store.subscribe(() => {
+      setVersion((v) => v + 1);
+    });
+    return unsubscribe;
+  }, []);
+
+  const state = store.getState();
+
+  const handleCellClick = (index) => {
+    store.dispatch({ type: "CLICK_CELL", payload: { index } });
+  };
+
   return (
     <div className={styles.gameBoard}>
-      {field.map((el, index) => (
+      {state.field.map((el, index) => (
         <div
           key={index}
           className={styles.cell}
@@ -15,14 +32,4 @@ export const FieldLayout = ({ field, handleCellClick }) => {
       ))}
     </div>
   );
-};
-
-FieldLayout.propTypes = {
-  field: PropTypes.arrayOf(
-    PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.oneOf([''])
-    ])
-  ).isRequired,
-  onClick: PropTypes.func.isRequired,
 };
