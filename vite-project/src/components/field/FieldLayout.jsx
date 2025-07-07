@@ -1,16 +1,9 @@
 import styles from "./FieldLayout.module.css";
-import { store } from "../../store";
 
-export const FieldLayout = () => {
-  const state = store.getState();
-
-  const handleCellClick = (index) => {
-    store.dispatch({ type: "CLICK_CELL", payload: { index } });
-  };
-
+export const FieldLayout = ({ field, handleCellClick }) => {
   return (
     <div className={styles.gameBoard}>
-      {state.field.map((el, index) => (
+      {field.map((el, index) => (
         <div
           key={index}
           className={styles.cell}

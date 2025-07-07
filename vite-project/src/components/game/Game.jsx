@@ -12,5 +12,9 @@ export const Game = () => {
     return unsubscribe;
   }, []);
 
-  return <GameLayout />;
+  const handleResetClick = () => {
+    store.dispatch({ type: "RESET" });
+  };
+
+  return <GameLayout onReset={handleResetClick} />;
 };

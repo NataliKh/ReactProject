@@ -1,17 +1,12 @@
 import { Field } from "../field/Field.jsx";
 import { Information } from "../information/Information.jsx";
-import { store } from "../../store";
 
-export const GameLayout = () => {
-  const handleResetClick = () => {
-    store.dispatch({ type: "RESET" });
-  };
-
+export const GameLayout = ({ onReset }) => {
   return (
     <>
       <Information />
       <Field />
-      <button onClick={handleResetClick}>Начать заново</button>
+      <button onClick={onReset}>Начать заново</button>
     </>
   );
 };
