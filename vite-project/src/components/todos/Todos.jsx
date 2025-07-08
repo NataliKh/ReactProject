@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Todo } from "../todo/Todo.jsx";
+import { TodoForm } from "../todo-form/TodoForm.jsx";
+import { TodoPanel } from "../todo-panel/TodoPanel.jsx";
 import styles from "./Todos.module.css";
 import {
   loadedTodos,
@@ -19,7 +21,6 @@ export const Todos = () => {
   );
 
   const [searchInputValue, setSearchInputValue] = useState(searchInput);
-  const [todoInput, setTodoInput] = useState("");
 
   const debounceTimeout = useRef(null);
 
@@ -32,10 +33,8 @@ export const Todos = () => {
   }, [dispatch]);
 
   // Добавление новой задачи
-  const handleAddNewTodo = () => {
-    if (todoInput.trim() === "") return;
-    dispatch(addNewTodo(todoInput.trim()));
-    setTodoInput("");
+  const handleAddNewTodo = (todoText) => {
+    dispatch(addNewTodo(todoText));
   };
 
   // Удаление задачи
@@ -76,61 +75,14 @@ export const Todos = () => {
 
   return (
     <>
-      <div className={styles["input-with-button"]}>
-        <input
-          className={styles["add-todo-input"]}
-          type="text"
-          value={todoInput}
-          placeholder="Новая задача"
-          onChange={(e) => setTodoInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") handleAddNewTodo();
-          }}
-        />
-        <button
-          className={styles["add-todo-button-inside"]}
-          onClick={handleAddNewTodo}
-          disabled={isProcessing}
-          aria-label="Добавить задачу"
-        >
-          +
-        </button>
-      </div>
+      <TodoForm onAddTodo={handleAddNewTodo} isProcessing={isProcessing} />
 
-      <div className={styles["todo-panel"]}>
-        <div className={styles["todo-panel__search"]}>
-          <input
-            placeholder="Поиск..."
-            value={searchInputValue}
-            onChange={handleSearchInput}
-            aria-label="Поиск задач"
-          />
-        </div>
-        <div className={styles["todo-panel__sort"]}>
-          <button
-            aria-label="Сортировать"
-            onClick={handleSorted}
-            className={`${isSorted ? styles["sort-active"] : ""}`}
-          >
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-              <path
-                d="M6 7L10 3L14 7"
-                stroke="#555"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M14 13L10 17L6 13"
-                stroke="#555"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        </div>
-      </div>
+      <TodoPanel
+        searchInputValue={searchInputValue}
+        onSearchInput={handleSearchInput}
+        onSorted={handleSorted}
+        isSorted={isSorted}
+      />
 
       {isProcessing && <p>Загрузка...</p>}
 
